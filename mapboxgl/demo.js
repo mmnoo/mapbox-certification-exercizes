@@ -4,7 +4,7 @@ import chicagoTransit from "./chicagoTransit.js";
     "pk.eyJ1IjoibWVsaXNzYW4iLCJhIjoiczJYeVJGZyJ9.K4Ie0hc1OFYepQaXACwnTg";
   var map = new mapboxgl.Map({
     container: "map",
-    style: "mapbox://styles/mapbox/streets-v11", //"mapbox://styles/mapbox/satellite-v9",
+    style: "mapbox://styles/mapbox/light-v10",
     center: [-87.62, 41.87],
     zoom: 12,
   });
@@ -13,21 +13,18 @@ import chicagoTransit from "./chicagoTransit.js";
     type: "geojson",
     data: {
       type: "FeatureCollection",
-      features: [],
+      features: [
+        {
+          type: "Feature",
+          geometry: {
+            type: "Point",
+            coordinates: [],
+          },
+        },
+      ],
     },
   };
-  const differentGeoJson = {
-    type: "FeatureCollection",
-    features: [
-      {
-        type: "Feature",
-        geometry: {
-          type: "Point",
-          coordinates: [-87.62, 41.87],
-        },
-      },
-    ],
-  };
+
   map.on("load", function () {
     map.addSource("busses", placeholderGeoJson);
     map.addLayer({
@@ -40,8 +37,21 @@ import chicagoTransit from "./chicagoTransit.js";
     });
   });
   map.on("styledata", function () {
+    const routes = "3,4,6,8,9,11,12,20";
     if (map.getSource("busses")) {
-      map.getSource("busses").setData(differentGeoJson); // Error: Input data is not a valid GeoJSON object.
+      chicagoTransit.getBusLocations(routes).then((busLocations) => {
+        map.getSource("busses").setData(busLocations);
+      });
+
+      const busUpdates = setInterval(() => {
+        chicagoTransit.getBusLocations(routes).then((busLocations) => {
+          map.getSource("busses").setData(busLocations);
+        });
+      }, 5000);
+      setTimeout(() => {
+        console.log("done");
+        clearInterval(busUpdates);
+      }, 25000);
     }
   });
 }
