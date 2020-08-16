@@ -5,7 +5,7 @@ import chicagoTransit from "./chicagoTransit.js";
   var map = new mapboxgl.Map({
     container: "map",
     style: "mapbox://styles/mapbox/light-v10",
-    center: [-87.62, 41.87],
+    center: [-87.665, 41.87],
     zoom: 12,
   });
 
@@ -26,13 +26,25 @@ import chicagoTransit from "./chicagoTransit.js";
   };
 
   map.on("load", function () {
+    // get road-related layerids in a hacky gross way
+    const roadLayerIds = map.style.stylesheet.layers
+      .map((layer) => layer.id.includes("road") && layer.id)
+      .filter((id) => id && !id.includes("label"));
+    roadLayerIds.forEach((id) => {
+      map.setPaintProperty(id, "line-color", "#6a3d9a");
+    });
+
     map.addSource("busses", placeholderGeoJson);
     map.addLayer({
       id: "busses",
-      type: "symbol",
+      type: "circle",
       source: "busses",
-      layout: {
-        "icon-image": "monument-15",
+      paint: {
+        "circle-color": "#fdbf6f",
+        "circle-stroke-color": "#ff7f00",
+        "circle-stroke-width": 1,
+        "circle-radius": 6,
+        "circle-opacity": 0.9,
       },
     });
   });
@@ -49,7 +61,6 @@ import chicagoTransit from "./chicagoTransit.js";
         });
       }, 5000);
       setTimeout(() => {
-        console.log("done");
         clearInterval(busUpdates);
       }, 25000);
     }
