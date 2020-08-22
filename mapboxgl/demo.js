@@ -9,6 +9,11 @@ import * as exercizes from "./certificationExercize.js";
     center: [-87.665, 41.87],
     zoom: 12,
   });
+  const popup = new mapboxgl.Popup({
+    closeButton: false,
+    closeOnClick: false,
+  });
   exercizes.addUpdatingData(map);
   exercizes.addStylingOnHover(map);
+  exercizes.addPopupOnHover(map, popup);
 }

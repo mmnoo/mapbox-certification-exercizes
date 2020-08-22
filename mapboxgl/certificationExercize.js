@@ -41,6 +41,18 @@ const addStylingOnHover = (map) => {
   });
 };
 
+const addPopupOnHover = (map, popup) => {
+  map.on("mousemove", "busses", (event) => {
+    const feature = event.features[0];
+    const coordinates = feature.geometry.coordinates.slice();
+    const content = `<dl><dt>Vehicle ID :</dt><dd>${feature.properties.vid} (technically this info is both from external source, and point properties)</dd><dl>`;
+
+    popup.setLngLat(coordinates).setHTML(content).addTo(map);
+  });
+  map.on("mouseleave", "busses", function () {
+    popup.remove();
+  });
+};
 const addUpdatingData = (map) => {
   const placeholderSource = {
     type: "geojson",
@@ -105,6 +117,7 @@ const addUpdatingData = (map) => {
   });
 };
 export {
+  addPopupOnHover,
   addStylingOnHover,
   addUpdatingData,
 };
