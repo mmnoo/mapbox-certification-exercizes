@@ -6,9 +6,36 @@
       href="https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.css"
       rel="stylesheet"
     />
+    <style>
+      .row {
+        display: flex;
+      }
+      #notes {
+        flex-shrink: 4;
+        padding: 15px;
+      }
+    </style>
   </head>
   <body>
-    <div id="map" style="width: 600px; height: 500px;"></div>
+    <div class="row">
+      <div id="map" style="width: 700px; height: 500px;"></div>
+      <div id="notes">
+        Notes:
+        <ul>
+          <li>
+            The CORS proxy for the data feed is slow. Please be patient to see
+            the data load in the map (for time management, I am not going to
+            spend time proving that I can implement a loading indicator)
+          </li>
+          <li>
+            The CTA data feed only updates once per minute, so its not very
+            visually impressive. The underlying code works though. 
+          </li>
+          <li>
+            I'd recommend future courses supply a sample updating data feed to work with that allows cross origin requests.</li></I>
+        </ul>
+      </div>
+    </div>
 
     <script src="demo.js" type="module"></script>
   </body>

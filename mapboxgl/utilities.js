@@ -3,7 +3,12 @@ const convertToGeojson = (objectArrayWithLatLon) => {
   const features = objectArrayWithLatLon["bustime-response"].vehicle.map(
     (feature) => ({
       type: "Feature",
-      geometry: { type: "Point", coordinates: [feature.lon, feature.lat] },
+
+      geometry: {
+        type: "Point",
+        coordinates: [feature.lon, feature.lat],
+      },
+      properties: { vid: feature.vid },
     })
   );
   return {

@@ -9,8 +9,9 @@ import chicagoTransit from "./chicagoTransit.js";
     zoom: 12,
   });
 
-  const placeholderGeoJson = {
+  const placeholderSource = {
     type: "geojson",
+    generateId: true,
     data: {
       type: "FeatureCollection",
       features: [
@@ -34,7 +35,7 @@ import chicagoTransit from "./chicagoTransit.js";
       map.setPaintProperty(id, "line-color", "#6a3d9a");
     });
 
-    map.addSource("busses", placeholderGeoJson);
+    map.addSource("busses", placeholderSource);
     map.addLayer({
       id: "busses",
       type: "circle",
@@ -43,7 +44,12 @@ import chicagoTransit from "./chicagoTransit.js";
         "circle-color": "#fdbf6f",
         "circle-stroke-color": "#ff7f00",
         "circle-stroke-width": 1,
-        "circle-radius": 6,
+        "circle-radius": [
+          "case",
+          ["boolean", ["feature-state", "hover"], false],
+          12,
+          6,
+        ],
         "circle-opacity": 0.9,
       },
     });
@@ -53,16 +59,37 @@ import chicagoTransit from "./chicagoTransit.js";
     if (map.getSource("busses")) {
       chicagoTransit.getBusLocations(routes).then((busLocations) => {
         map.getSource("busses").setData(busLocations);
+        // this feed only updated once per minute, so you wont see much movement on the map, but it technically works
+        // const busUpdates = setInterval(() => {
+        //   chicagoTransit.getBusLocations(routes).then((busLocations) => {
+        //     map.getSource("busses").setData(busLocations);
+        //   });
+        // }, 60000);
+        // setTimeout(() => {
+        //   clearInterval(busUpdates);
+        // }, 60000 * 10);
       });
-
-      const busUpdates = setInterval(() => {
-        chicagoTransit.getBusLocations(routes).then((busLocations) => {
-          map.getSource("busses").setData(busLocations);
-        });
-      }, 5000);
-      setTimeout(() => {
-        clearInterval(busUpdates);
-      }, 25000);
     }
   });
+  {
+    let hoveredStateId; //should be unecessary
+    map.on("mousemove", "busses", (event) => {
+      // cant find API documentation detailing features object on MapMouseEvent
+      if (event.features.length > 0) {
+        map.setFeatureState(
+          { source: "busses", id: event.features[0].id },
+          { hover: true }
+        );
+      }
+      hoveredStateId = event.features[0].id; // should be unecessary
+    });
+    map.on("mouseleave", "busses", function () {
+      // For DX this event should include a features property like the mousemove event does.
+      // For function, but also consistency.Then a developer doesnt have to create a symbol to hold 'hoverStateId'.
+      map.setFeatureState(
+        { source: "busses", id: hoveredStateId },
+        { hover: false }
+      );
+    });
+  }
 }
