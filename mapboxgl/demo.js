@@ -16,4 +16,5 @@ import * as exercizes from "./certificationExercize.js";
   exercizes.addUpdatingData(map);
   exercizes.addStylingOnHover(map);
   exercizes.addPopupOnHover(map, popup);
+  exercizes.addCenterMapOnClick(map);
 }

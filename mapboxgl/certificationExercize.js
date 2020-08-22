@@ -116,8 +116,16 @@ const addUpdatingData = (map) => {
     }
   });
 };
+
+const addCenterMapOnClick = (map) => {
+  map.on("click", function (event) {
+    map.panTo(event.lngLat);
+  });
+};
+
 export {
   addPopupOnHover,
+  addCenterMapOnClick,
   addStylingOnHover,
   addUpdatingData,
 };
