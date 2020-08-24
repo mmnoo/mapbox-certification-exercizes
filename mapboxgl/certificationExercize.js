@@ -45,7 +45,14 @@ const addPopupOnHover = (map, popup) => {
   map.on("mousemove", "busses", (event) => {
     const feature = event.features[0];
     const coordinates = feature.geometry.coordinates.slice();
-    const content = `<dl><dt>Vehicle ID :</dt><dd>${feature.properties.vid} (technically this info is both from external source, and point properties)</dd><dl>`;
+    const content = `
+    <dl>
+      <dt>Vehicle ID (from esternal source):</dt>
+        <dd>${feature.properties.vid}</dd>
+      <dt>Property of 'point'(?)</dt>
+        <dd>Latitude: ${event.lngLat.lat}</dd>
+        <dd>Longitude: ${event.lngLat.lng}</dd>
+    <dl>`;
 
     popup.setLngLat(coordinates).setHTML(content).addTo(map);
   });
