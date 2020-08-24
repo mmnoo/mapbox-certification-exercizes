@@ -17,6 +17,13 @@
       dt{
         font-weight: bolder;
       }
+      .catMarker{
+        background-image: url('cat.svg');
+        background-size: cover;
+        width: 50px;
+        height: 50px;
+      }
+ 
     </style>
   </head>
   <body>
@@ -26,10 +33,13 @@
         Notes:
         <ul>
           <li>
-            The free CORS proxy for the data feed is slow. Please be patient to see
-            the data load in the map 
+            The free CORS proxy for the data feed is slow and inconsistent. Please be patient to see
+            the data load in the map. 
           </li>
-          <li>For time management, I am not going to spend time proving that I can implement a loading indicator, or CORS proxy server</li>
+          <li>For time management, I am not going to spend time proving 
+            that I can implement a loading indicator, or CORS proxy server. 
+            To tell if the data response has come through,  
+            dev tools' network tab can be checked. </li>
           <li>
             The CTA data feed only updates once per minute, so its not very
             visually impressive. The underlying code works though. 

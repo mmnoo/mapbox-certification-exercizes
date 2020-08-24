@@ -130,9 +130,19 @@ const addCenterMapOnClick = (map) => {
   });
 };
 
+const addNewPointOnClick = (map) => {
+  const catMarkerElement = document.createElement("div");
+  catMarkerElement.className = "catMarker";
+
+  map.on("click", function (event) {
+    new mapboxgl.Marker(catMarkerElement).setLngLat(event.lngLat).addTo(map);
+  });
+};
+
 export {
   addPopupOnHover,
   addCenterMapOnClick,
   addStylingOnHover,
   addUpdatingData,
+  addNewPointOnClick,
 };
