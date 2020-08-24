@@ -47,8 +47,10 @@ const addPopupOnHover = (map, popup) => {
     const coordinates = feature.geometry.coordinates.slice();
     const content = `
     <dl>
-      <dt>Vehicle ID (from esternal source):</dt>
+      <dt>Vehicle ID (from external source):</dt>
         <dd>${feature.properties.vid}</dd>
+      <dt>Route Number (from external source):</dt>
+        <dd>${feature.properties.routeId}</dd>
       <dt>Property of 'point'(?)</dt>
         <dd>Latitude: ${event.lngLat.lat}</dd>
         <dd>Longitude: ${event.lngLat.lng}</dd>
@@ -60,7 +62,36 @@ const addPopupOnHover = (map, popup) => {
     popup.remove();
   });
 };
-const addUpdatingData = (map) => {
+
+const _routefilter = { current: [3, 4, 6, 8, 9, 11, 12, 20] };
+
+const _ctaBusLocations = {};
+
+const _toggleRouteFilterValue = (stringValue) => {
+  const value = Number(stringValue);
+
+  if (_routefilter.current.includes(value)) {
+    _routefilter.current = _routefilter.current.filter(
+      (item) => item !== value
+    );
+  } else {
+    _routefilter.current.push(value);
+  }
+};
+
+const _updateMapData = (map) => {
+  const filteredCtaBusLocations = {
+    type: "FeatureCollection",
+    features: _ctaBusLocations.current.features.filter((feature) =>
+      _routefilter.current.includes(Number(feature.properties.routeId))
+    ),
+  };
+
+  map.getSource("busses").setData(filteredCtaBusLocations);
+};
+
+const addUpdatingData = (map, routes) => {
+  _routefilter.current = routes;
   const placeholderSource = {
     type: "geojson",
     generateId: true,
@@ -106,21 +137,44 @@ const addUpdatingData = (map) => {
     });
   });
   map.on("styledata", function () {
-    const routes = "3,4,6,8,9,11,12,20";
     if (map.getSource("busses")) {
       chicagoTransit.getBusLocations(routes).then((busLocations) => {
-        map.getSource("busses").setData(busLocations);
+        _ctaBusLocations.current = busLocations;
+
+        _updateMapData(map);
         // this feed only updated once per minute, so you wont see much movement on the map, but it technically works
-        // const busUpdates = setInterval(() => {
-        //   chicagoTransit.getBusLocations(routes).then((busLocations) => {
-        //     map.getSource("busses").setData(busLocations);
-        //   });
-        // }, 60000);
-        // setTimeout(() => {
-        //   clearInterval(busUpdates);
-        // }, 60000 * 10);
+        const busUpdates = setInterval(() => {
+          chicagoTransit.getBusLocations(routes).then((busLocations) => {
+            _ctaBusLocations.current = busLocations;
+            _updateMapData(map, busLocations);
+          });
+        }, 60000);
+        setTimeout(() => {
+          clearInterval(busUpdates);
+        }, 60000 * 10);
       });
     }
+  });
+};
+
+const addDataFilter = (map) => {
+  const routeFilterElement = document.getElementById("route-filter");
+  _routefilter.current.forEach((route) => {
+    const input = document.createElement("input");
+    input.type = "checkbox";
+    input.id = route;
+    input.checked = true;
+    input.value = route;
+    input.onclick = (event) => {
+      _toggleRouteFilterValue(event.target.value);
+      _updateMapData(map);
+    };
+    routeFilterElement.appendChild(input);
+
+    var label = document.createElement("label");
+    label.setAttribute("for", route);
+    label.textContent = route;
+    routeFilterElement.appendChild(label);
   });
 };
 
@@ -132,7 +186,7 @@ const addCenterMapOnClick = (map) => {
 
 const addNewPointOnClick = (map) => {
   const catMarkerElement = document.createElement("div");
-  catMarkerElement.className = "catMarker";
+  catMarkerElement.className = "cat-marker";
 
   map.on("click", function (event) {
     new mapboxgl.Marker(catMarkerElement).setLngLat(event.lngLat).addTo(map);
@@ -140,9 +194,10 @@ const addNewPointOnClick = (map) => {
 };
 
 export {
-  addPopupOnHover,
   addCenterMapOnClick,
+  addDataFilter,
+  addNewPointOnClick,
+  addPopupOnHover,
   addStylingOnHover,
   addUpdatingData,
-  addNewPointOnClick,
 };

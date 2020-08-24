@@ -7,17 +7,23 @@
       rel="stylesheet"
     />
     <style>
+      body{
+        max-width: 1200px;
+      }
       .row {
         display: flex;
       }
-      #notes {
+      #side-panel {
         flex-shrink: 4;
         padding: 15px;
       }
       dt{
         font-weight: bolder;
       }
-      .catMarker{
+      dd{
+        margin-left: 0;
+      }
+      .cat-marker{
         background-image: url('cat.svg');
         background-size: cover;
         width: 50px;
@@ -29,7 +35,13 @@
   <body>
     <div class="row">
       <div id="map" style="width: 700px; height: 500px;"></div>
-      <div id="notes">
+      <div id="side-panel">
+        
+      <form>
+        <fieldset id="route-filter"> 
+          <legend>Show busses with route #</legend>           
+        </fieldset> 
+      </form>
         Notes:
         <ul>
           <li>

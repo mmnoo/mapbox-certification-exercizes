@@ -8,7 +8,7 @@ const convertToGeojson = (objectArrayWithLatLon) => {
         type: "Point",
         coordinates: [feature.lon, feature.lat],
       },
-      properties: { vid: feature.vid },
+      properties: { vid: feature.vid, routeId: feature.rt },
     })
   );
   return {
