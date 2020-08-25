@@ -9,7 +9,7 @@
     />
 
     <style>
-      body{
+      body {
         max-width: 1200px;
         font-family: Arial, Helvetica, sans-serif;
       }
@@ -20,50 +20,56 @@
         flex-shrink: 4;
         padding: 15px;
       }
-      dt{
+      dt {
         font-weight: bolder;
       }
-      dd{
+      dd {
         margin-left: 0;
       }
-      .cat-marker{
-        background-image: url('cat.svg');
+      .cat-marker {
+        background-image: url("cat.svg");
         background-size: cover;
         width: 50px;
         height: 50px;
       }
- 
     </style>
   </head>
   <body>
     <div class="row">
       <div id="map" style="width: 700px; height: 500px;"></div>
       <div id="side-panel">
-        
-      <form>
-        <fieldset id="route-filter"> 
-          <legend>Show busses with route #</legend>           
-        </fieldset> 
-      </form>
+        <form>
+          <fieldset id="route-filter">
+            <legend>Show busses with route #</legend>
+          </fieldset>
+        </form>
         Notes:
         <ul>
           <li>
-            The free CORS proxy for the data feed is slow and inconsistent. Please be patient to see
-            the data load in the map. 
-          </li>
-          <li>Because there are restrictions on how much one can use the 
-            CORS proxy server, the bus locations will only be updated
-             3 times.</li>
-          <li>For time management, I am not going to spend time proving 
-            that I can implement a loading indicator, or CORS proxy server. 
-            To tell if the data response has come through,  
-            dev tools' network tab can be checked. </li>
-          <li>
-            The CTA data feed only updates once per minute, so its not very
-            visually impressive. The underlying code works though. 
+            <b
+              >The browser site settings need to allow mixed content for this
+              demo to work with the updating data via a CORS proxy.
+            </b>
+            <a
+              href="https://docs.adobe.com/content/help/en/target/using/experiences/vec/troubleshoot-composer/mixed-content.html"
+              >Instructions to enable mixed-content</a
+            >
           </li>
           <li>
-            I'd recommend future courses supply a sample updating data feed to work with that allows cross origin requests.</li></I>
+            The free CORS proxy for the data feed is slow and inconsistent.
+            <b>Please be patient to see the data load in the map.</b>
+          </li>
+          <li>
+            Because there are restrictions on how much one can use the CORS
+            proxy server, the bus locations will only be updated 3 times. The
+            data feed updates once per minute.
+          </li>
+          <li>
+            For time management, I am not going to spend time proving that I can
+            implement a loading indicator, or CORS proxy server. To tell if the
+            data response has come through, dev tools' network tab can be
+            checked.
+          </li>
         </ul>
       </div>
     </div>
