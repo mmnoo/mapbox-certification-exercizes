@@ -95,16 +95,19 @@ const addPopupOnHover = (map, popup) => {
     popup.remove();
   });
 };
+const _customizeBasemapStyle = (map) => {
+  // get road-related layerids in a hacky gross way
+  const roadLayerIds = map.style.stylesheet.layers
+    .map((layer) => layer.id.includes("road") && layer.id)
+    .filter((id) => id && !id.includes("label"));
+  roadLayerIds.forEach((id) => {
+    map.setPaintProperty(id, "line-color", "#6a3d9a");
+  });
+};
 
 const customizeBasemapStyle = (map) => {
   map.on("load", () => {
-    // get road-related layerids in a hacky gross way
-    const roadLayerIds = map.style.stylesheet.layers
-      .map((layer) => layer.id.includes("road") && layer.id)
-      .filter((id) => id && !id.includes("label"));
-    roadLayerIds.forEach((id) => {
-      map.setPaintProperty(id, "line-color", "#6a3d9a");
-    });
+    _customizeBasemapStyle(map);
   });
 };
 
@@ -226,6 +229,9 @@ const changeBasemapOnZoom = (map) => {
     // would be nice if setStyle() returned something indicating if it had updated or not
     map.on("styledata", () => {
       _updateMapData(map);
+      if (currentZoom <= 12) {
+        _customizeBasemapStyle(map);
+      }
     });
   });
 };
