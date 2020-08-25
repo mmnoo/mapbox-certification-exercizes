@@ -23,4 +23,6 @@ import * as exercizes from "./certificationExercize.js";
   exercizes.addCenterMapOnClick(map);
   exercizes.addNewPointOnClick(map);
   exercizes.addStylingOnHover(map);
+  exercizes.changeBasemapOnZoom(map);
+  exercizes.customizeBasemapStyle(map);
 }

@@ -2,10 +2,12 @@
   <head>
     <title>Mabbox Demo</title>
     <script src="https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.20/lodash.min.js"></script>
     <link
       href="https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.css"
       rel="stylesheet"
     />
+
     <style>
       body{
         max-width: 1200px;
@@ -48,6 +50,9 @@
             The free CORS proxy for the data feed is slow and inconsistent. Please be patient to see
             the data load in the map. 
           </li>
+          <li>Because there are restrictions on how much one can use the 
+            CORS proxy server, the bus locations will only be updated
+             3 times.</li>
           <li>For time management, I am not going to spend time proving 
             that I can implement a loading indicator, or CORS proxy server. 
             To tell if the data response has come through,  

@@ -1,5 +1,34 @@
 import chicagoTransit from "./chicagoTransit.js";
 
+const _routefilter = { current: [3, 4, 6, 8, 9, 11, 12, 20] };
+
+const _ctaBusLocations = {};
+
+const _toggleRouteFilterValue = (stringValue) => {
+  const value = Number(stringValue);
+
+  if (_routefilter.current.includes(value)) {
+    _routefilter.current = _routefilter.current.filter(
+      (item) => item !== value
+    );
+  } else {
+    _routefilter.current.push(value);
+  }
+};
+
+const _updateMapData = (map) => {
+  const filteredCtaBusLocations = {
+    type: "FeatureCollection",
+    features: _ctaBusLocations.current.features.filter((feature) =>
+      _routefilter.current.includes(Number(feature.properties.routeId))
+    ),
+  };
+  if (!map.getSource("busses")) {
+    _initializeBusData(map);
+  }
+  map.getSource("busses").setData(filteredCtaBusLocations);
+};
+
 const addStylingOnHover = (map) => {
   //const hoveredStateID; // tracking this should be unecessary
   map.on("mousemove", "busses", (event) => {
@@ -63,52 +92,8 @@ const addPopupOnHover = (map, popup) => {
   });
 };
 
-const _routefilter = { current: [3, 4, 6, 8, 9, 11, 12, 20] };
-
-const _ctaBusLocations = {};
-
-const _toggleRouteFilterValue = (stringValue) => {
-  const value = Number(stringValue);
-
-  if (_routefilter.current.includes(value)) {
-    _routefilter.current = _routefilter.current.filter(
-      (item) => item !== value
-    );
-  } else {
-    _routefilter.current.push(value);
-  }
-};
-
-const _updateMapData = (map) => {
-  const filteredCtaBusLocations = {
-    type: "FeatureCollection",
-    features: _ctaBusLocations.current.features.filter((feature) =>
-      _routefilter.current.includes(Number(feature.properties.routeId))
-    ),
-  };
-
-  map.getSource("busses").setData(filteredCtaBusLocations);
-};
-
-const addUpdatingData = (map, routes) => {
-  _routefilter.current = routes;
-  const placeholderSource = {
-    type: "geojson",
-    generateId: true,
-    data: {
-      type: "FeatureCollection",
-      features: [
-        {
-          type: "Feature",
-          geometry: {
-            type: "Point",
-            coordinates: [],
-          },
-        },
-      ],
-    },
-  };
-  map.on("load", function () {
+const customizeBasemapStyle = (map) => {
+  map.on("load", () => {
     // get road-related layerids in a hacky gross way
     const roadLayerIds = map.style.stylesheet.layers
       .map((layer) => layer.id.includes("road") && layer.id)
@@ -116,25 +101,51 @@ const addUpdatingData = (map, routes) => {
     roadLayerIds.forEach((id) => {
       map.setPaintProperty(id, "line-color", "#6a3d9a");
     });
+  });
+};
 
-    map.addSource("busses", placeholderSource);
-    map.addLayer({
-      id: "busses",
-      type: "circle",
-      source: "busses",
-      paint: {
-        "circle-color": "#fdbf6f",
-        "circle-stroke-color": "#ff7f00",
-        "circle-stroke-width": 1,
-        "circle-radius": [
-          "case",
-          ["boolean", ["feature-state", "hover"], false],
-          12,
-          6,
-        ],
-        "circle-opacity": 0.9,
-      },
-    });
+const _initializeBusData = (map) => {
+  const placeholderSource = {
+    type: "geojson",
+    generateId: true,
+    data: {
+      type: "FeatureCollection",
+      features: [
+        // {
+        //   type: "Feature",
+        //   geometry: {
+        //     type: "Point",
+        //     coordinates: [],
+        //   },
+        // },
+      ],
+    },
+  };
+
+  map.addSource("busses", placeholderSource);
+  map.addLayer({
+    id: "busses",
+    type: "circle",
+    source: "busses",
+    paint: {
+      "circle-color": "#fdbf6f",
+      "circle-stroke-color": "#ff7f00",
+      "circle-stroke-width": 1,
+      "circle-radius": [
+        "case",
+        ["boolean", ["feature-state", "hover"], false],
+        12,
+        6,
+      ],
+      "circle-opacity": 0.9,
+    },
+  });
+};
+const addUpdatingData = (map, routes) => {
+  _routefilter.current = routes;
+
+  map.on("load", function () {
+    _initializeBusData(map);
   });
   map.on("styledata", function () {
     if (map.getSource("busses")) {
@@ -143,15 +154,15 @@ const addUpdatingData = (map, routes) => {
 
         _updateMapData(map);
         // this feed only updated once per minute, so you wont see much movement on the map, but it technically works
-        const busUpdates = setInterval(() => {
-          chicagoTransit.getBusLocations(routes).then((busLocations) => {
-            _ctaBusLocations.current = busLocations;
-            _updateMapData(map, busLocations);
-          });
-        }, 60000);
-        setTimeout(() => {
-          clearInterval(busUpdates);
-        }, 60000 * 10);
+        // const busUpdates = setInterval(() => {
+        //   chicagoTransit.getBusLocations(routes).then((busLocations) => {
+        //     _ctaBusLocations.current = busLocations;
+        //     _updateMapData(map);
+        //   });
+        // }, 60000);
+        // setTimeout(() => {
+        //   clearInterval(busUpdates);
+        // }, 60000 * 3);
       });
     }
   });
@@ -193,6 +204,24 @@ const addNewPointOnClick = (map) => {
   });
 };
 
+const changeBasemapOnZoom = (map) => {
+  map.on("zoom", () => {
+    const currentZoom = map.getZoom();
+    const baseMap =
+      currentZoom > 12
+        ? "mapbox://styles/mapbox/satellite-v9"
+        : "mapbox://styles/mapbox/light-v10";
+    map.setStyle(baseMap);
+    // woah my data dissappeared!
+    // Very imperfect hack to get it back.
+    // Fell down an overly imperative rabbit hole and
+    // gave up trying to prevent unecessary layer updates.
+    map.once("styledata", () => {
+      _updateMapData(map);
+    });
+  });
+};
+
 export {
   addCenterMapOnClick,
   addDataFilter,
@@ -200,4 +229,6 @@ export {
   addPopupOnHover,
   addStylingOnHover,
   addUpdatingData,
+  changeBasemapOnZoom,
+  customizeBasemapStyle,
 };
