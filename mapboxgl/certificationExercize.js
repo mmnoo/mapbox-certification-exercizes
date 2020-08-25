@@ -23,10 +23,14 @@ const _updateMapData = (map) => {
       _routefilter.current.includes(Number(feature.properties.routeId))
     ),
   };
-  if (!map.getSource("busses")) {
-    _initializeBusData(map);
+
+  if (map.getSource("busses")) {
+    map.getSource("busses").setData(filteredCtaBusLocations);
+  } else {
+    _initializeBusData(map).then(() => {
+      map.getSource("busses").setData(filteredCtaBusLocations);
+    });
   }
-  map.getSource("busses").setData(filteredCtaBusLocations);
 };
 
 const addStylingOnHover = (map) => {
@@ -110,15 +114,7 @@ const _initializeBusData = (map) => {
     generateId: true,
     data: {
       type: "FeatureCollection",
-      features: [
-        // {
-        //   type: "Feature",
-        //   geometry: {
-        //     type: "Point",
-        //     coordinates: [],
-        //   },
-        // },
-      ],
+      features: [],
     },
   };
 
@@ -140,15 +136,16 @@ const _initializeBusData = (map) => {
       "circle-opacity": 0.9,
     },
   });
+  return new Promise((resolve) => {
+    map.once("styledata", () => {
+      resolve();
+    });
+  });
 };
 const addUpdatingData = (map, routes) => {
-  _routefilter.current = routes;
-
-  map.on("load", function () {
-    _initializeBusData(map);
-  });
-  map.on("styledata", function () {
+  const setUpDataFetching = () => {
     if (map.getSource("busses")) {
+      console.log("grab data");
       chicagoTransit.getBusLocations(routes).then((busLocations) => {
         _ctaBusLocations.current = busLocations;
 
@@ -163,8 +160,16 @@ const addUpdatingData = (map, routes) => {
         setTimeout(() => {
           clearInterval(busUpdates);
         }, 60000 * 3);
+        map.off("styledata", setUpDataFetching);
       });
     }
+  };
+  _routefilter.current = routes;
+
+  map.on("load", function () {
+    _initializeBusData(map).then(() => {
+      setUpDataFetching();
+    });
   });
 };
 
@@ -212,11 +217,14 @@ const changeBasemapOnZoom = (map) => {
         ? "mapbox://styles/mapbox/satellite-v9"
         : "mapbox://styles/mapbox/light-v10";
     map.setStyle(baseMap);
+
     // woah my data dissappeared!
     // Very imperfect hack to get it back.
     // Fell down an overly imperative rabbit hole and
     // gave up trying to prevent unecessary layer updates.
-    map.once("styledata", () => {
+    // gave up making my work-around code cruft-free.
+    // would be nice if setStyle() returned something indicating if it had updated or not
+    map.on("styledata", () => {
       _updateMapData(map);
     });
   });
