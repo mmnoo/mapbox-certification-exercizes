@@ -154,15 +154,15 @@ const addUpdatingData = (map, routes) => {
 
         _updateMapData(map);
         // this feed only updated once per minute, so you wont see much movement on the map, but it technically works
-        // const busUpdates = setInterval(() => {
-        //   chicagoTransit.getBusLocations(routes).then((busLocations) => {
-        //     _ctaBusLocations.current = busLocations;
-        //     _updateMapData(map);
-        //   });
-        // }, 60000);
-        // setTimeout(() => {
-        //   clearInterval(busUpdates);
-        // }, 60000 * 3);
+        const busUpdates = setInterval(() => {
+          chicagoTransit.getBusLocations(routes).then((busLocations) => {
+            _ctaBusLocations.current = busLocations;
+            _updateMapData(map);
+          });
+        }, 60000);
+        setTimeout(() => {
+          clearInterval(busUpdates);
+        }, 60000 * 3);
       });
     }
   });
