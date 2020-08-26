@@ -1,11 +1,10 @@
 import utilities from "./utilities.js";
 const getBusLocations = (routeIds) => {
-  // would be nice to have a live updating data endpoint supplied for the course
-  // so I dont need to get distracted with CORS hacks that stop working and restrict # of calls
-  // or figuring out third party data sources. Now I am dealing with sunk costs.
-  const proxyUrl = "http://cors-anywhere.herokuapp.com/";
-  const busLocationsUrl = `http://ctabustracker.com/bustime/api/v2/getvehicles?key=8rWBbYr4wbNziLJYRDvaJKK7n&format=json&rt=${routeIds}`;
-  return fetch(proxyUrl + busLocationsUrl)
+  // for focus, a participant of a course focusing on front-end tech shouldnt have to set up a proxy server
+  // to avoid CORS issues with an external data source.Better for Mapbox to supply one with an unrestrictive CORS policy
+
+  const busLocationsUrl = `../.netlify/functions/getbusdata?rt=${routeIds}`;
+  return fetch(busLocationsUrl)
     .then((blob) => blob.json())
     .then((data) => {
       return new Promise((resolve) => {

@@ -1,0 +1,5 @@
+functions = "lambda/"
+publish = "."
+
+[context.production]
+  publish = "."
