@@ -148,7 +148,6 @@ const _initializeBusData = (map) => {
 const addUpdatingData = (map, routes) => {
   const setUpDataFetching = () => {
     if (map.getSource("busses")) {
-      console.log("grab data");
       chicagoTransit.getBusLocations(routes).then((busLocations) => {
         _ctaBusLocations.current = busLocations;
 
@@ -160,9 +159,6 @@ const addUpdatingData = (map, routes) => {
             _updateMapData(map);
           });
         }, 60000);
-        setTimeout(() => {
-          clearInterval(busUpdates);
-        }, 60000 * 3);
         map.off("styledata", setUpDataFetching);
       });
     }

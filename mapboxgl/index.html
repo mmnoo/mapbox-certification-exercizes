@@ -35,40 +35,50 @@
     </style>
   </head>
   <body>
+    <h1>Sample of Chicago live-updating bus locations</h1>
     <div class="row">
-      <div id="map" style="width: 700px; height: 500px;"></div>
+      <div id="map" style="width: 700px; height: 500px"></div>
       <div id="side-panel">
         <form>
           <fieldset id="route-filter">
             <legend>Show busses with route #</legend>
           </fieldset>
         </form>
+        Explanation: App satisfies minimum requirements for Mapbox GL JS
+        certification course
+        <ul>
+          <li>Map should have a custom (non-default) style</li>
+          <li>Map should present a series of points, updating in real-time</li>
+          <li>
+            Hovering over a point should change a visual attribute (size, color,
+            etc)
+          </li>
+          <li>Hovering over a point should create a popup</li>
+          <li>
+            Popups should contain data from an external source AND properties of
+            the point
+          </li>
+          <li>Map should be searchable</li>
+          <li>Map should center on click</li>
+          <li>Clicking on point should add an HTML marker</li>
+          <li>
+            Points should be filterable based on properties (through some kind
+            UI)
+          </li>
+          <li>Map should switch to satellite imagery as user zooms in</li>
+        </ul>
         Notes:
         <ul>
+          <li>Data feed only updates once per minute</li>
           <li>
-            <b
-              >The browser site settings need to allow mixed content for this
-              demo to work with the updating data via a CORS proxy.
-            </b>
-            <a
-              href="https://docs.adobe.com/content/help/en/target/using/experiences/vec/troubleshoot-composer/mixed-content.html"
-              >Instructions to enable mixed-content</a
-            >
+            This is an MVP, if you dont see the data, please check the dev tool
+            network tab to make sure the data API has returned. Proving that I
+            can implement loading indicators is out of scope due to time
+            management.
           </li>
+          <li>Quality code is out-of-scope.</li>
           <li>
-            The free CORS proxy for the data feed is slow and inconsistent.
-            <b>Please be patient to see the data load in the map.</b>
-          </li>
-          <li>
-            Because there are restrictions on how much one can use the CORS
-            proxy server, the bus locations will only be updated 3 times. The
-            data feed updates once per minute.
-          </li>
-          <li>
-            For time management, I am not going to spend time proving that I can
-            implement a loading indicator, or CORS proxy server. To tell if the
-            data response has come through, dev tools' network tab can be
-            checked.
+            Code contains further comments on improvements to the API and bugs.
           </li>
         </ul>
       </div>
